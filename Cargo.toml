@@ -1,0 +1,15 @@
+[package]
+name = "prompt-hash"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.74"
+description = "Deterministic cache key for an LLM prompt: normalize whitespace, hash messages, mix in model + temperature. Pairs with semantic-cache-key. Zero deps."
+authors = ["Mukunda Rao Katta <mukunda.vjcs6@gmail.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/MukundaKatta/prompt-hash"
+homepage = "https://github.com/MukundaKatta/prompt-hash"
+documentation = "https://docs.rs/prompt-hash"
+readme = "README.md"
+keywords = ["prompt", "hash", "cache-key", "llm", "deterministic"]
+categories = ["caching", "cryptography"]
+exclude = [".github/*", "target/*"]
