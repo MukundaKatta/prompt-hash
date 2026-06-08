@@ -72,3 +72,29 @@ fn identical_inputs_are_stable() {
     let b = key("claude", &[("user", "hello"), ("assistant", "hi")], 0.7);
     assert_eq!(a, b);
 }
+
+#[test]
+fn crlf_normalizes_to_lf() {
+    // CRLF and lone CR line endings must hash the same as LF.
+    let lf = key("m", &[("user", "line1\nline2")], 1.0);
+    let crlf = key("m", &[("user", "line1\r\nline2")], 1.0);
+    let cr = key("m", &[("user", "line1\rline2")], 1.0);
+    assert_eq!(lf, crlf);
+    assert_eq!(lf, cr);
+}
+
+#[test]
+fn trailing_whitespace_stripped_per_line() {
+    // Trailing spaces/tabs on interior lines must not change the key.
+    let clean = key("m", &[("user", "a\nb\nc")], 1.0);
+    let trailing = key("m", &[("user", "a  \nb\t\nc")], 1.0);
+    assert_eq!(clean, trailing);
+}
+
+#[test]
+fn leading_whitespace_is_significant() {
+    // Only trailing whitespace is normalized; leading indentation matters.
+    let a = key("m", &[("user", "  x")], 1.0);
+    let b = key("m", &[("user", "x")], 1.0);
+    assert_ne!(a, b);
+}

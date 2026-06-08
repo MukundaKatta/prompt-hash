@@ -1,6 +1,6 @@
 //! Pure-Rust SHA-256 (FIPS 180-4). Adequate for hashing prompts;
 //! NOT a cryptographic API — no HMAC, no constant-time anything.
-//! Inlined here to keep promptver dependency-free.
+//! Inlined here to keep prompt-hash dependency-free.
 
 const K: [u32; 64] = [
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -124,6 +124,34 @@ mod tests {
         assert_eq!(
             hex(s.as_bytes()),
             "cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0"
+        );
+    }
+
+    // The following exercise the padding boundaries: 55 bytes is the largest
+    // input that still fits (with the 0x80 byte + 8-byte length) in a single
+    // block; 56 bytes forces a second padding block; 64 bytes is exactly one
+    // full block followed by a pad-only block.
+    #[test]
+    fn padding_55_bytes() {
+        assert_eq!(
+            hex(&[b'a'; 55]),
+            "9f4390f8d30c2dd92ec9f095b65e2b9ae9b0a925a5258e241c9f1e910f734318"
+        );
+    }
+
+    #[test]
+    fn padding_56_bytes_forces_extra_block() {
+        assert_eq!(
+            hex(&[b'a'; 56]),
+            "b35439a4ac6f0948b6d6f9e3c6af0f5f590ce20f1bde7090ef7970686ec6738a"
+        );
+    }
+
+    #[test]
+    fn exactly_one_full_block() {
+        assert_eq!(
+            hex(&[b'a'; 64]),
+            "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb"
         );
     }
 }
